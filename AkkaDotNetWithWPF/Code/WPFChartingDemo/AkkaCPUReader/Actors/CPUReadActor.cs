@@ -22,6 +22,22 @@ namespace AkkaCPUReader
         public CPUReadActor()
         {
             Receive<ReadCPURequestMessage>(msg => ReceiveReadDataMessage());
+            Receive<ReadCPUSyncMessage>(msg => ReceiveSyncMessage(msg));
+        }
+
+        private void ReceiveSyncMessage(ReadCPUSyncMessage msg)
+        {
+            switch (msg.Op)
+            {
+                case SyncOp.Start:
+                    OnCommandStart();
+                    break;
+                case SyncOp.Stop:
+                    OnCommandStop();
+                    break;
+                default:
+                    throw new Exception("unknown Op " + msg.Op.ToString());
+            }
         }
 
         private void ReceiveReadDataMessage()
@@ -32,14 +48,23 @@ namespace AkkaCPUReader
 
         protected override void PreStart()
         {
+            //start on command
+        }
+
+        private void OnCommandStart()
+        {
             _timer = Context.System
-                .Scheduler
-                .ScheduleTellRepeatedlyCancelable(
-                    TimeSpan.FromSeconds(1),
-                    TimeSpan.FromMilliseconds(200),
-                    Self,
-                    new ReadCPURequestMessage(),
-                    Self);
+               .Scheduler
+               .ScheduleTellRepeatedlyCancelable(
+                   TimeSpan.FromSeconds(1),
+                   TimeSpan.FromMilliseconds(200),
+                   Self,
+                   new ReadCPURequestMessage(),
+                   Self);
+        }
+        private void OnCommandStop()
+        {
+            _timer.Cancel();
         }
     }
 }

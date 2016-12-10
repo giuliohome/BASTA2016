@@ -16,6 +16,7 @@ namespace AkkaCPUReader
     {
         private static ActorSystem _actorSystem;
 
+        private static IActorRef coordActor;
         public static void CreateActorSystem(Action<float, DateTime> SetDataPointAction)
         {
             _actorSystem = ActorSystem.Create("akka");
@@ -23,7 +24,21 @@ namespace AkkaCPUReader
             Action<float, DateTime> DataPointSetter = SetDataPointAction;
             var chartingActor = _actorSystem.ActorOf(Props.Create(() => new ChartingActor(DataPointSetter)));
 
-            var coordActor = _actorSystem.ActorOf(Props.Create(() => new CoordinatorActor(chartingActor)), "Coord");
+            coordActor = _actorSystem.ActorOf(Props.Create(() => new CoordinatorActor(chartingActor)), "Coord");
+        }
+        public static void Start()
+        {
+            if (coordActor != null)
+            {
+                coordActor.Tell(new StartMsg());
+            }
+        }
+        public static void Stop()
+        {
+            if (coordActor != null)
+            {
+                coordActor.Tell(new StopMsg());
+            }
         }
     }
 }

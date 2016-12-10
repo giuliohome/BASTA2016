@@ -29,8 +29,24 @@ namespace AkkaCPUReader
 
 
             Receive<DataMessage>(msg => ReceiveDataMessage(msg));
+            Receive<StartMsg>(msg => TellStart());
+            Receive<StopMsg>(msg => TellStop());
         }
 
+        public void TellStart()
+        {
+            foreach (IActorRef collector in _collectorActors)
+            {
+                collector.Tell(new ReadCPUSyncMessage() { Op = SyncOp.Start });
+            }
+        }
+        public void TellStop()
+        {
+            foreach (IActorRef collector in _collectorActors)
+            {
+                collector.Tell(new ReadCPUSyncMessage() { Op = SyncOp.Stop });
+            }
+        }
 
         private void ReceiveDataMessage(DataMessage msg)
         {

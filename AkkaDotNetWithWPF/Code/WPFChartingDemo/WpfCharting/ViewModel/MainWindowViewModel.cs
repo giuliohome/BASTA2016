@@ -34,9 +34,11 @@ namespace WpfCharting.ViewModel
 
         private void StartCpuMethod() {
             Debug.WriteLine("StartCpuMethod");
+            ActorSystemReference.Start();
         }
         private void StopCpuMethod() {
             Debug.WriteLine("StopCpuMethod");
+            ActorSystemReference.Stop();
         }
         public ICommand StartCpuCommand { get; private set; }
         public ICommand StopCpuCommand { get; private set; }
