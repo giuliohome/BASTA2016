@@ -8,6 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using AkkaCPUReader;
 using OxyPlot.Series;
+using System.Diagnostics;
+using GalaSoft.MvvmLight.Command;
+using System.Windows.Input;
 
 namespace WpfCharting.ViewModel
 {
@@ -29,9 +32,20 @@ namespace WpfCharting.ViewModel
             set { Set(() => CurrentValue, ref _currentValue, value); }
         }
 
+        private void StartCpuMethod() {
+            Debug.WriteLine("StartCpuMethod");
+        }
+        private void StopCpuMethod() {
+            Debug.WriteLine("StopCpuMethod");
+        }
+        public ICommand StartCpuCommand { get; private set; }
+        public ICommand StopCpuCommand { get; private set; }
 
         public MainWindowViewModel()
         {
+            StartCpuCommand = new RelayCommand(StartCpuMethod);
+            StopCpuCommand = new RelayCommand(StopCpuMethod);
+
             SetupChartModel();
             Action<float, DateTime> dataPointSetter = new Action<float, DateTime>((v, d) => SetDataPoint(v, d));
 
